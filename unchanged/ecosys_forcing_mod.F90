@@ -151,6 +151,7 @@ module ecosys_forcing_mod
   type(tracer_read)   :: iron_flux_input              ! namelist input for iron_flux
   type(tracer_read)   :: fesedflux_input              ! namelist input for fesedflux
   type(tracer_read)   :: feventflux_input             ! namelist input for feventflux
+  type(tracer_read)   :: docventflux_input             ! namelist input for docventflux
   character(char_len) :: o2_consumption_scalef_opt    ! option for specification of o2_consumption_scalef
   real(r8)            :: o2_consumption_scalef_const  ! constant for o2_consumption_scalef_opt=const
   type(tracer_read)   :: o2_consumption_scalef_input  ! file info for o2_consumption_scalef_opt=file_time_invariant
@@ -287,7 +288,8 @@ module ecosys_forcing_mod
                        potemp_ind         = 0, &
                        salinity_ind       = 0, &
                        pressure_ind       = 0, &
-                       fesedflux_ind      = 0
+                       fesedflux_ind      = 0, &
+                       docventflux_ind      = 0
 
   !-----------------------------------------------------------------------
   ! Other private variables
@@ -380,7 +382,7 @@ contains
     namelist /ecosys_forcing_data_nml/                                        &
          dust_flux_source, dust_flux_input, iron_flux_source,                 &
          dust_ratio_thres, fe_bioavail_frac_offset, dust_ratio_to_fe_bioavail_frac_r, &
-         iron_flux_input, fesedflux_input, feventflux_input,                  &
+         iron_flux_input, fesedflux_input, feventflux_input, docventflux_input,   &
          o2_consumption_scalef_opt, o2_consumption_scalef_const,              &
          o2_consumption_scalef_input,                                         &
          p_remin_scalef_opt, p_remin_scalef_const, p_remin_scalef_input,      &
@@ -436,6 +438,7 @@ contains
     call set_defaults_tracer_read(iron_flux_input, file_varname='iron_flux')
     call set_defaults_tracer_read(fesedflux_input, file_varname='FESEDFLUXIN')
     call set_defaults_tracer_read(feventflux_input, file_varname='FESEDFLUXIN')
+    call set_defaults_tracer_read(docventflux_input, file_varname='DOCSEDFLUXIN')
     o2_consumption_scalef_opt   = 'const'
     o2_consumption_scalef_const = c1
     call set_defaults_tracer_read(o2_consumption_scalef_input, file_varname='o2_consumption_scalef')
@@ -1007,6 +1010,15 @@ contains
                           file_varname=fesedflux_input%file_varname,          &
                           unit_conv_factor=fesedflux_input%scale_factor,      &
                           rank=3, dim3_len=km, id=n)
+          case ('DOC Flux')
+            docventflux_ind = n
+            call interior_tendency_forcings(n)%add_forcing_field(                &
+                          field_source='file_time_invariant',                 &
+                          marbl_varname=marbl_varname, field_units=units,     &
+                          filename=docventflux_input%filename,                  &
+                          file_varname=docventflux_input%file_varname,          &
+                          unit_conv_factor=docventflux_input%scale_factor,      &
+                          rank=3, dim3_len=km, id=n)
           case ('O2 Consumption Scale Factor')
             select case (trim(o2_consumption_scalef_opt))
             case ('const')
@@ -1353,6 +1365,7 @@ contains
     integer :: iblock, k, n ! loop indices
 
     real (r8), allocatable, target :: feventflux(:,:,:,:) !  Fe from vents
+    real (r8), allocatable, target :: docventflux(:,:,:,:) !  doc from vents
 
     do iblock = 1, nblocks_clinic
 
@@ -1363,6 +1376,12 @@ contains
       if (fesedflux_ind > 0) then
         associate (fesedflux => interior_tendency_forcings(fesedflux_ind)%field_1d)
           call add_subsurf_to_bottom(land_mask(:,:,iblock), fesedflux(:,:,:,iblock), iblock)
+        end associate
+      endif
+
+      if (docventflux_ind > 0) then
+        associate (docventflux => interior_tendency_forcings(docventflux_ind)%field_1d)
+          call add_subsurf_to_bottom(land_mask(:,:,iblock), docventflux(:,:,:,iblock), iblock)
         end associate
       endif
 
