@@ -1,0 +1,10 @@
+changing files for docsedflux variable
+duplicating from feventflux and fesedflux variables...
+
+
+
+namelist_defaults_pop.xml
+namelist_definition_pop.xml
+ecosys_forcing_mod.F90
+marbl_interior_tendency_mod.F90
+user_nl_pop_docrvent
