@@ -230,6 +230,7 @@ contains
          pressure            => interior_tendency_forcings(interior_tendency_forcing_indices%pressure_id)%field_1d(1,:), &
          salinity            => interior_tendency_forcings(interior_tendency_forcing_indices%salinity_id)%field_1d(1,:), &
          fesedflux           => interior_tendency_forcings(interior_tendency_forcing_indices%fesedflux_id)%field_1d(1,:),&
+         docventflux           => interior_tendency_forcings(interior_tendency_forcing_indices%docventflux_id)%field_1d(1,:),&
 
          po4_ind           => marbl_tracer_indices%po4_ind,         &
          no3_ind           => marbl_tracer_indices%no3_ind,         &
@@ -3350,13 +3351,14 @@ contains
        zooplankton_derived_terms, dissolved_organic_matter, nitrif, denitrif, sed_denitrif, &
        Fe_scavenge, Lig_prod, Lig_loss, P_iron_remin, POC_remin, POP_remin, P_SiO2_remin, &
        P_CaCO3_remin, P_CaCO3_ALT_CO2_remin, other_remin, PON_remin, tracer_local, &
-       o2_consumption_scalef, o2_production, o2_consumption, interior_tendencies)
+       o2_consumption_scalef, o2_production, o2_consumption, interior_tendencies, interior_tendency_forcing_indices)
 
     integer,                              intent(in)    :: km
     type(marbl_tracer_index_type),        intent(in)    :: marbl_tracer_indices
     type(autotroph_derived_terms_type),   intent(in)    :: autotroph_derived_terms
     type(zooplankton_derived_terms_type), intent(in)    :: zooplankton_derived_terms
     type(dissolved_organic_matter_type),  intent(in)    :: dissolved_organic_matter
+    type(marbl_interior_tendency_forcing_indexing_type),     intent(in)    :: interior_tendency_forcing_indices
     real(r8),                             intent(in)    :: nitrif(km)
     real(r8),                             intent(in)    :: denitrif(km)
     real(r8),                             intent(in)    :: sed_denitrif(km)
@@ -3376,6 +3378,7 @@ contains
     real(r8),                             intent(out)   :: o2_production(km)
     real(r8),                             intent(out)   :: o2_consumption(km)
     real(r8),                             intent(inout) :: interior_tendencies(marbl_tracer_indices%total_cnt, km)
+    real(r8),                             intent(in)    :: docventflux           ! sedimentary DOC input
 
     !-----------------------------------------------------------------------
     !  local variables
@@ -3448,7 +3451,8 @@ contains
          dop_ind           => marbl_tracer_indices%dop_ind,                 &
          dopr_ind          => marbl_tracer_indices%dopr_ind,                &
          donr_ind          => marbl_tracer_indices%donr_ind,                &
-         docr_ind          => marbl_tracer_indices%docr_ind                 &
+         docr_ind          => marbl_tracer_indices%docr_ind,                 &
+         docventflux     => interior_tendency_forcings(interior_tendency_forcing_indices%docventflux_id)%field_1d(1,:) &
          )
 
       do k=1, km
@@ -3563,7 +3567,7 @@ contains
         !  from sinking remin small fraction to refractory pool
         !-----------------------------------------------------------------------
 
-        interior_tendencies(doc_ind,k) = DOC_prod(k) * (c1 - DOCprod_refract) - DOC_remin(k)
+        interior_tendencies(doc_ind,k) = DOC_prod(k) * (c1 - DOCprod_refract) - DOC_remin(k) + docventflux(k)
 
         interior_tendencies(docr_ind,k) = DOC_prod(k) * DOCprod_refract - DOCr_remin(k) + (POC_remin(k) * POCremin_refract)
 
