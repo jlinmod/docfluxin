@@ -3451,7 +3451,7 @@ contains
          dopr_ind          => marbl_tracer_indices%dopr_ind,                &
          donr_ind          => marbl_tracer_indices%donr_ind,                &
          docr_ind          => marbl_tracer_indices%docr_ind,                &
-         docventflux       => interior_tendency_forcing_indices%docventflux_id &
+         docventflux       => interior_tendency_forcing%docventflux_ind     &
          )
 
       do k=1, km
