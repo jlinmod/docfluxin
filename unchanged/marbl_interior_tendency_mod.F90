@@ -230,7 +230,6 @@ contains
          pressure            => interior_tendency_forcings(interior_tendency_forcing_indices%pressure_id)%field_1d(1,:), &
          salinity            => interior_tendency_forcings(interior_tendency_forcing_indices%salinity_id)%field_1d(1,:), &
          fesedflux           => interior_tendency_forcings(interior_tendency_forcing_indices%fesedflux_id)%field_1d(1,:),&
-         docventflux           => interior_tendency_forcings(interior_tendency_forcing_indices%docventflux_id)%field_1d(1,:),&
 
          po4_ind           => marbl_tracer_indices%po4_ind,         &
          no3_ind           => marbl_tracer_indices%no3_ind,         &
