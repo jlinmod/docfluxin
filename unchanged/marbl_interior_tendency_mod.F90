@@ -3450,8 +3450,8 @@ contains
          dop_ind           => marbl_tracer_indices%dop_ind,                 &
          dopr_ind          => marbl_tracer_indices%dopr_ind,                &
          donr_ind          => marbl_tracer_indices%donr_ind,                &
-         docr_ind          => marbl_tracer_indices%docr_ind,                 &
-         docventflux     => interior_tendency_forcings(interior_tendency_forcing_indices%docventflux_id)%field_1d(1,:) &
+         docr_ind          => marbl_tracer_indices%docr_ind,                &
+         docventflux       => interior_tendency_forcing_indices%docventflux_id &
          )
 
       do k=1, km
