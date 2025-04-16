@@ -3377,7 +3377,7 @@ contains
     real(r8),                             intent(out)   :: o2_production(km)
     real(r8),                             intent(out)   :: o2_consumption(km)
     real(r8),                             intent(inout) :: interior_tendencies(marbl_tracer_indices%total_cnt, km)
-    real(r8),                             intent(in)    :: docventflux           ! sedimentary DOC input
+    real(r8),                             intent(in)    :: docventflux(km)           ! sedimentary DOC input
 
     !-----------------------------------------------------------------------
     !  local variables
