@@ -3350,7 +3350,7 @@ contains
        zooplankton_derived_terms, dissolved_organic_matter, nitrif, denitrif, sed_denitrif, &
        Fe_scavenge, Lig_prod, Lig_loss, P_iron_remin, POC_remin, POP_remin, P_SiO2_remin, &
        P_CaCO3_remin, P_CaCO3_ALT_CO2_remin, other_remin, PON_remin, tracer_local, &
-       o2_consumption_scalef, o2_production, o2_consumption, interior_tendencies)
+       o2_consumption_scalef, o2_production, o2_consumption, interior_tendencies, docventflux)
 
     integer,                              intent(in)    :: km
     type(marbl_tracer_index_type),        intent(in)    :: marbl_tracer_indices
