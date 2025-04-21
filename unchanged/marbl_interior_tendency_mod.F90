@@ -187,6 +187,7 @@ contains
     real (r8) :: Lig_deg(domain%km)          ! loss of Fe-binding Ligand from bacterial degradation
     real (r8) :: Lig_loss(domain%km)         ! loss of Fe-binding Ligand
     real (r8) :: totalChl_local(domain%km)   ! local value of totalChl
+    real (r8) :: docventflux(domain%km)   ! local value of docvent
 
     ! NOTE(bja, 2015-07) vectorization: arrays that are (n, k, c, i)
     ! probably can not be vectorized reasonably over c without memory
@@ -404,7 +405,7 @@ contains
          tracer_local(:,:), &
          o2_consumption_scalef(:), &
          o2_production(:), o2_consumption(:), &
-         interior_tendencies(:,:))
+         interior_tendencies(:,:), docventflux)
 
     ! Compute interior diagnostics
     call marbl_diagnostics_interior_tendency_compute(       &
@@ -3350,7 +3351,7 @@ contains
        zooplankton_derived_terms, dissolved_organic_matter, nitrif, denitrif, sed_denitrif, &
        Fe_scavenge, Lig_prod, Lig_loss, P_iron_remin, POC_remin, POP_remin, P_SiO2_remin, &
        P_CaCO3_remin, P_CaCO3_ALT_CO2_remin, other_remin, PON_remin, tracer_local, &
-       o2_consumption_scalef, o2_production, o2_consumption, interior_tendencies)
+       o2_consumption_scalef, o2_production, o2_consumption, interior_tendencies, docventflux)
 
     integer,                              intent(in)    :: km
     type(marbl_tracer_index_type),        intent(in)    :: marbl_tracer_indices
@@ -3376,6 +3377,7 @@ contains
     real(r8),                             intent(out)   :: o2_production(km)
     real(r8),                             intent(out)   :: o2_consumption(km)
     real(r8),                             intent(inout) :: interior_tendencies(marbl_tracer_indices%total_cnt, km)
+    real(r8),                             intent(in)    :: docventflux(km)           ! sedimentary DOC input
 
     !-----------------------------------------------------------------------
     !  local variables
@@ -3563,7 +3565,7 @@ contains
         !  from sinking remin small fraction to refractory pool
         !-----------------------------------------------------------------------
 
-        interior_tendencies(doc_ind,k) = DOC_prod(k) * (c1 - DOCprod_refract) - DOC_remin(k)
+        interior_tendencies(doc_ind,k) = DOC_prod(k) * (c1 - DOCprod_refract) - DOC_remin(k) + docventflux(k)
 
         interior_tendencies(docr_ind,k) = DOC_prod(k) * DOCprod_refract - DOCr_remin(k) + (POC_remin(k) * POCremin_refract)
 
